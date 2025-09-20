@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Трекер посетителей</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.5;
+        }
+        .visitor-info {
+            background: #f0f0f0;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Поздравляю!</h1>
+    <p>Данный сайт является практической частью проекта <b>Наговицына Семена</b>. Если вы перешли по ссылке - то вы попались в руки мошенников. <b><i>Будьте бдительны!</i></b></p>
+
+    <div class="visitor-info">
+        <h3>Ваши данные:</h3>
+        <p id="ip"><strong>IP:</strong> Загрузка...</p>
+        <p id="browser"><strong>Браузер:</strong> Загрузка...</p>
+        <p id="os"><strong>ОС:</strong> Загрузка...</p>
+        <p id="screen"><strong>Экран:</strong> Загрузка...</p>
+        <p id="time"><strong>Время захода:</strong> Загрузка...</p>
+    </div>
+
+    <script>
+        // Определяем данные о посетителе
+        const getBrowser = () => {
+            const ua = navigator.userAgent;
+            if (ua.includes("Firefox")) return "Firefox";
+            if (ua.includes("Edg")) return "Edge";
+            if (ua.includes("Chrome")) return "Chrome";
+            if (ua.includes("Safari")) return "Safari";
+            return "Неизвестный браузер";
+        };
+
+        const getOS = () => {
+            const ua = navigator.userAgent;
+            if (ua.includes("Windows")) return "Windows";
+            if (ua.includes("Mac")) return "MacOS";
+            if (ua.includes("Linux")) return "Linux";
+            if (ua.includes("Android")) return "Android";
+            return "Неизвестная ОС";
+        };
+
+        // Получаем IP и отправляем данные
+        fetch('https://api.ipify.org?format=json')
+            .then(res => res.json())
+            .then(ipData => {
+                const visitorData = {
+                    ip: ipData.ip,
+                    browser: getBrowser(),
+                    os: getOS(),
+                    screen: `${screen.width}x${screen.height}`,
+                    time: new Date().toLocaleString(),
+                    referrer: document.referrer || "Прямой заход"
+                };
+
+                // Показываем данные на странице
+                document.getElementById("ip").textContent = `IP: ${visitorData.ip}`;
+                document.getElementById("browser").textContent = `Браузер: ${visitorData.browser}`;
+                document.getElementById("os").textContent = `ОС: ${visitorData.os}`;
+                document.getElementById("screen").textContent = `Экран: ${visitorData.screen}`;
+                document.getElementById("time").textContent = `Время: ${visitorData.time}`;
+
+                // Отправляем на сервер
+                fetch('asd.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(visitorData)
+                })
+                .then(res => res.text())
+                .then(console.log)
+                .catch(console.error);
+            })
+            .catch(() => {
+                document.getElementById("ip").textContent = "IP: Не удалось определить";
+            });
+    </script>
+</body>
+</html>
